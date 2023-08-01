@@ -100,7 +100,64 @@ func BuscarTarefa(w http.ResponseWriter, r *http.Request) {
 }
 
 func EditarTarefa(w http.ResponseWriter, r *http.Request) {
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
 
+	parametros := mux.Vars(r)
+	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeTarefas(db)
+	tarefaSalvaNoBanco, erro := repositorio.BuscarTarefa(tarefaId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if usuarioId != tarefaSalvaNoBanco.AutorId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel editar uma tarefa que não seja sua"))
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	var tarefaAtualizada modelos.Tarefas
+
+	if erro = json.Unmarshal(corpoRequest, &tarefaAtualizada); erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	if erro = tarefaAtualizada.Preparar(); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = repositorio.Atualizar(tarefaId, tarefaAtualizada); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+		respostas.JSON(w, http.StatusOK, nil)
+
+	
 }
 
 func DeletarTarefa(w http.ResponseWriter, r *http.Request) {

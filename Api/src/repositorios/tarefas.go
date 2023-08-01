@@ -112,3 +112,17 @@ func (repositorio Tarefas) BuscarTarefas(tarefaId uint64) ([]modelos.Tarefas, er
 	}
 	return Tarefa, nil
 }
+
+func (repositorio Tarefas) Atualizar(tarefaId uint64, tarefaAtualziada modelos.Tarefas) error {
+	statement, erro := repositorio.db.Prepare("update tarefas set tarefa = ?, observacao = ?, prazo = ? where id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro := statement.Exec(tarefaAtualziada.Tarefa, tarefaAtualziada.Obsevacao, tarefaAtualziada.Prazo, tarefaId); erro != nil {
+		return erro
+	}
+
+	return nil 
+}
