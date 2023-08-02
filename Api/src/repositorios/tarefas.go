@@ -3,6 +3,7 @@ package repositorios
 import (
 	"api/src/modelos"
 	"database/sql"
+	"errors"
 )
 
 type Tarefas struct {
@@ -81,12 +82,12 @@ func (repositorio Tarefas) Deletar(tarefaId uint64) error {
 
 }
 
-func (repositorio Tarefas) BuscarTarefas(tarefaId uint64) ([]modelos.Tarefas, error) {
+func (repositorio Tarefas) BuscarPorUsuario(usuarioId uint64) ([]modelos.Tarefas, error) {
 	linhas, erro := repositorio.db.Query(`
 	select t.*, u.nick from tarefas t
-	join tarefas u on u.id = t.autor_id
-	where t.autor_id ?`,
-		tarefaId,
+	join usuarios u on u.id = t.autor_id
+	where t.autor_id = ?`,
+		usuarioId,
 	)
 	if erro != nil {
 		return nil, erro
@@ -108,6 +109,10 @@ func (repositorio Tarefas) BuscarTarefas(tarefaId uint64) ([]modelos.Tarefas, er
 		); erro != nil {
 			return nil, erro
 		}
+		if usuarioId != tarefa.AutorId {
+			return nil, errors.New("Não é possível buscar tarefas de outro usuario!")
+		}
+
 		Tarefa = append(Tarefa, tarefa)
 	}
 	return Tarefa, nil
