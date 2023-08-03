@@ -49,8 +49,7 @@ func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) 
 	defer linhas.Close()
 
 	var equipes []equipe.Equipes
-
-	for linhas.Next(){
+	for linhas.Next() {
 		var equipe equipe.Equipes
 
 		if erro = linhas.Scan(
@@ -59,10 +58,33 @@ func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) 
 			&equipe.Descricao,
 			&equipe.AutorId,
 		); erro != nil {
-			return nil, erro 
+			return nil, erro
 		}
 		equipes = append(equipes, equipe)
 	}
 
-	return equipes, nil 
+	return equipes, nil
+}
+
+func (repositorio Equipe) BuscarPorId(equipeId uint64) (equipe.Equipes, error) {
+	linha, erro := repositorio.db.Query("select id, nome, descricao, autor_id from equipes where id = ?", equipeId)
+	if erro != nil {
+		return equipe.Equipes{}, erro
+	}
+	defer linha.Close()
+
+	var Equipe equipe.Equipes
+
+	if linha.Next() {
+		if erro = linha.Scan(
+			&Equipe.Id,
+			&Equipe.Nome,
+			&Equipe.Descricao,
+			&Equipe.AutorId,
+		); erro != nil {
+			return equipe.Equipes{}, erro
+		}
+	}
+
+	return Equipe, nil
 }
