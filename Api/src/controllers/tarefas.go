@@ -66,7 +66,6 @@ func CriarTarefa(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.JSON(w, http.StatusCreated, tarefa)
-
 }
 
 func BuscarTarefasDoUsuario(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +102,6 @@ func BuscarTarefasDoUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.JSON(w, http.StatusOK, tarefas)
-
 }
 
 
@@ -130,7 +128,6 @@ func BuscarTarefa(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.JSON(w, http.StatusOK, tarefa)
-
 }
 
 func EditarTarefa(w http.ResponseWriter, r *http.Request) {
@@ -190,8 +187,6 @@ func EditarTarefa(w http.ResponseWriter, r *http.Request) {
 	}
 
 		respostas.JSON(w, http.StatusOK, nil)
-
-	
 }
 
 func DeletarTarefa(w http.ResponseWriter, r *http.Request) {
