@@ -3,6 +3,7 @@ package repositorios
 import (
 	"api/src/equipe"
 	"database/sql"
+	"fmt"
 )
 
 type Equipe struct {
@@ -33,4 +34,35 @@ func (repositorio Equipe) CriarEquipe(equipe equipe.Equipes) (uint64, error) {
 	}
 
 	return uint64(ultimoIdInserido), nil
+}
+
+func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) {
+	nomeDaEquipe = fmt.Sprintf("%%%s%%", nomeDaEquipe)
+
+	linhas, erro := repositorio.db.Query(
+		"select id, nome, descricao, autor_id from equipes where nome LIKE ?",
+		nomeDaEquipe,
+	)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var equipes []equipe.Equipes
+
+	for linhas.Next(){
+		var equipe equipe.Equipes
+
+		if erro = linhas.Scan(
+			&equipe.Id,
+			&equipe.Nome,
+			&equipe.Descricao,
+			&equipe.AutorId,
+		); erro != nil {
+			return nil, erro 
+		}
+		equipes = append(equipes, equipe)
+	}
+
+	return equipes, nil 
 }

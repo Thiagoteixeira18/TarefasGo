@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func CriarEquipes(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +48,25 @@ func CriarEquipes(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func BuscarEquipes(w http.ResponseWriter, r *http.Request) {}
+func BuscarEquipes(w http.ResponseWriter, r *http.Request) {
+	nomeDaEquipe := strings.ToLower(r.URL.Query().Get("equipes"))
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipes, erro := repositorio.Buscar(nomeDaEquipe)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return 
+	}
+
+	respostas.JSON(w, http.StatusOK, equipes)
+}
 
 func BuscarEquipe(w http.ResponseWriter, r *http.Request) {}
 
