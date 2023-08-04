@@ -102,3 +102,17 @@ func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe equipe.Equipes
 
 	return nil
 }
+
+func (repositorio Equipe) DeletarEquipe(equipeId uint64) error {
+	statement, erro := repositorio.db.Prepare("delete from equipes where id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(equipeId); erro != nil {
+		return erro
+	}
+
+	return nil
+}
