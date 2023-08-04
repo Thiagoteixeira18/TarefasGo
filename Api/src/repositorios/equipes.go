@@ -88,3 +88,17 @@ func (repositorio Equipe) BuscarPorId(equipeId uint64) (equipe.Equipes, error) {
 
 	return Equipe, nil
 }
+
+func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe equipe.Equipes) error {
+	statement, erro := repositorio.db.Prepare("update equipes set nome = ?, descricao = ? where id = ?")
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(Equipe.Nome, Equipe.Descricao, equipeId); erro != nil {
+		return erro
+	}
+
+	return nil
+}
