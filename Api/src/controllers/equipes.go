@@ -3,7 +3,7 @@ package controllers
 import (
 	"api/src/autenticacao"
 	"api/src/banco"
-	"api/src/equipe"
+	"api/src/modelos"
 	"api/src/repositorios"
 	"api/src/respostas"
 	"encoding/json"
@@ -28,7 +28,7 @@ func CriarEquipes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var equipe equipe.Equipes
+	var equipe modelos.Equipes
 	if erro = json.Unmarshal(corpoRequest, &equipe); erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
@@ -141,11 +141,11 @@ func AtualizarEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var Equipe equipe.Equipes
+	var Equipe modelos.Equipes
 
 	if erro = json.Unmarshal(corpoRequest, &Equipe); erro != nil {
 		respostas.Erro(w, http.StatusForbidden, erro)
-		return 
+		return
 	}
 
 	if erro = Equipe.Preparar(); erro != nil {
@@ -200,4 +200,51 @@ func DeletarEquipe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respostas.JSON(w, http.StatusOK, nil)
+}
+
+func CriarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+		return
+	}
+
+	corpoRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	var tarefa modelos.Tarefas
+
+	if erro = json.Unmarshal(corpoRequest, &tarefa); erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+		return
+	}
+
+	tarefa.AutorId = usuarioId
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	repositorioEquipe := repositorios.NovoRepositorioDeEquipes(db)
+	tarefa.Id, erro = repositorioEquipe.CriarTarefaDeEquipe(tarefa, equipeId, usuarioId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusCreated, tarefa)
+
 }

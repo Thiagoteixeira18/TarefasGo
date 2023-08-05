@@ -1,7 +1,7 @@
 package repositorios
 
 import (
-	"api/src/equipe"
+	"api/src/modelos"
 	"database/sql"
 	"fmt"
 )
@@ -14,7 +14,7 @@ func NovoRepositorioDeEquipes(db *sql.DB) *Equipe {
 	return &Equipe{db}
 }
 
-func (repositorio Equipe) CriarEquipe(equipe equipe.Equipes) (uint64, error) {
+func (repositorio Equipe) CriarEquipe(equipe modelos.Equipes) (uint64, error) {
 	statement, erro := repositorio.db.Prepare(
 		"insert into equipes (nome, descricao, autor_id) value(?, ?, ?)",
 	)
@@ -36,7 +36,7 @@ func (repositorio Equipe) CriarEquipe(equipe equipe.Equipes) (uint64, error) {
 	return uint64(ultimoIdInserido), nil
 }
 
-func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) {
+func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]modelos.Equipes, error) {
 	nomeDaEquipe = fmt.Sprintf("%%%s%%", nomeDaEquipe)
 
 	linhas, erro := repositorio.db.Query(
@@ -48,9 +48,9 @@ func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) 
 	}
 	defer linhas.Close()
 
-	var equipes []equipe.Equipes
+	var equipes []modelos.Equipes
 	for linhas.Next() {
-		var equipe equipe.Equipes
+		var equipe modelos.Equipes
 
 		if erro = linhas.Scan(
 			&equipe.Id,
@@ -66,14 +66,14 @@ func (repositorio Equipe) Buscar(nomeDaEquipe string) ([]equipe.Equipes, error) 
 	return equipes, nil
 }
 
-func (repositorio Equipe) BuscarPorId(equipeId uint64) (equipe.Equipes, error) {
+func (repositorio Equipe) BuscarPorId(equipeId uint64) (modelos.Equipes, error) {
 	linha, erro := repositorio.db.Query("select id, nome, descricao, autor_id from equipes where id = ?", equipeId)
 	if erro != nil {
-		return equipe.Equipes{}, erro
+		return modelos.Equipes{}, erro
 	}
 	defer linha.Close()
 
-	var Equipe equipe.Equipes
+	var Equipe modelos.Equipes
 
 	if linha.Next() {
 		if erro = linha.Scan(
@@ -82,14 +82,14 @@ func (repositorio Equipe) BuscarPorId(equipeId uint64) (equipe.Equipes, error) {
 			&Equipe.Descricao,
 			&Equipe.AutorId,
 		); erro != nil {
-			return equipe.Equipes{}, erro
+			return modelos.Equipes{}, erro
 		}
 	}
 
 	return Equipe, nil
 }
 
-func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe equipe.Equipes) error {
+func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe modelos.Equipes) error {
 	statement, erro := repositorio.db.Prepare("update equipes set nome = ?, descricao = ? where id = ?")
 	if erro != nil {
 		return erro
@@ -115,4 +115,26 @@ func (repositorio Equipe) DeletarEquipe(equipeId uint64) error {
 	}
 
 	return nil
+}
+
+func (repositorio Equipe) CriarTarefaDeEquipe(tarefa modelos.Tarefas, equipeId uint64, usuarioId uint64) (uint64, error) {
+	statement, erro := repositorio.db.Prepare(
+		"insert into tarefas_equipe (tarefa, observacao, prazo, autor_id, equipes_id) value(?, ?, ?, ?, ?)",
+	)
+	if erro != nil {
+		return 0, erro
+	}
+	defer statement.Close()
+
+	resultado, erro := statement.Exec(tarefa.Tarefa, tarefa.Obsevacao, tarefa.Prazo, tarefa.AutorId, equipeId)
+	if erro != nil {
+		return 0, erro
+	}
+
+	ultimoIdInserido, erro := resultado.LastInsertId()
+	if erro != nil {
+		return 0, erro
+	}
+
+	return uint64(ultimoIdInserido), nil
 }

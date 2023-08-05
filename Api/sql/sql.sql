@@ -36,14 +36,22 @@ CREATE TABLE equipes (
     FOREIGN KEY (autor_id)
     REFERENCES usuarios(id)
     ON DELETE CASCADE, 
+) ENGINE=InnoDB;
 
-    tarefas_id INT, 
-    FOREIGN KEY (tarefas_id) 
-    REFERENCES tarefas(id)
-    ON DELETE CASCADE,
-   
-    participantes_id INT ,
-    FOREIGN KEY (participantes_id)
-    REFERENCES usuarios(id) 
-    ON DELETE CASCADE
+CREATE TABLE tarefas_equipe (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tarefa VARCHAR(100) NOT NULL, 
+    observacao VARCHAR(300),
+
+    autor_id INT NOT NULL,
+    FOREIGN KEY (autor_id)
+    REFERENCES usuarios(id)
+    ON DELETE CASCADE, 
+
+    equipes_id INT NOT NULL,
+    FOREIGN KEY (equipes_id)
+    REFERENCES equipes(id)
+    ON DELETE CASCADE, 
+
+    prazo VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
