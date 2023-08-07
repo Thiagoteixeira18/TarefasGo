@@ -8,10 +8,12 @@ import (
 	"api/src/respostas"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -224,6 +226,17 @@ func CriarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
 
 	tarefa.AutorId = usuarioId
 
+	layout := "02-01-2006"
+	tarefaPrazo, erro := time.Parse(layout, tarefa.Prazo)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	tarefa.Prazo = tarefaPrazo.Format(time.RFC3339)
+
+	diaDaSemana := tarefaPrazo.Weekday().String()
+	tarefa.Prazo = fmt.Sprintf("%s (%s)", tarefaPrazo.Format("02/01/2006"), diaDaSemana)
+
 	db, erro := banco.Conectar()
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
@@ -247,4 +260,29 @@ func CriarTarefaDeEquipe(w http.ResponseWriter, r *http.Request) {
 
 	respostas.JSON(w, http.StatusCreated, tarefa)
 
+}
+
+func BuscarTarefasDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	tarefas, erro := repositorio.BuscarTarefasDaEquipe(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, tarefas)
 }

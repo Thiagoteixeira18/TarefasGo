@@ -138,3 +138,29 @@ func (repositorio Equipe) CriarTarefaDeEquipe(tarefa modelos.Tarefas, equipeId u
 
 	return uint64(ultimoIdInserido), nil
 }
+
+func (repositorio Equipe) BuscarTarefasDaEquipe(equipeId uint64) ([]modelos.Tarefas, error) {
+	linhas, erro := repositorio.db.Query("SELECT tarefa, observacao, prazo FROM tarefas_equipe WHERE equipes_id = ?", equipeId)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var tarefasDaEquipe []modelos.Tarefas
+
+	for linhas.Next() {
+		var tarefa modelos.Tarefas
+
+		if erro = linhas.Scan(
+			&tarefa.Tarefa,
+			&tarefa.Obsevacao,
+			&tarefa.Prazo,
+		); erro != nil {
+			return nil, erro
+		}
+
+		tarefasDaEquipe = append(tarefasDaEquipe, tarefa)
+	}
+
+	return tarefasDaEquipe, nil
+}
