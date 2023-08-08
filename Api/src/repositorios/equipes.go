@@ -140,7 +140,7 @@ func (repositorio Equipe) CriarTarefaDeEquipe(tarefa modelos.Tarefas, equipeId u
 }
 
 func (repositorio Equipe) BuscarTarefasDaEquipe(equipeId uint64) ([]modelos.Tarefas, error) {
-	linhas, erro := repositorio.db.Query("SELECT tarefa, observacao, prazo FROM tarefas_equipe WHERE equipes_id = ?", equipeId)
+	linhas, erro := repositorio.db.Query("select id, autor_id, tarefa, observacao, prazo FROM tarefas_equipe WHERE equipes_id = ?", equipeId)
 	if erro != nil {
 		return nil, erro
 	}
@@ -152,6 +152,8 @@ func (repositorio Equipe) BuscarTarefasDaEquipe(equipeId uint64) ([]modelos.Tare
 		var tarefa modelos.Tarefas
 
 		if erro = linhas.Scan(
+			&tarefa.Id,
+			&tarefa.AutorId,
 			&tarefa.Tarefa,
 			&tarefa.Obsevacao,
 			&tarefa.Prazo,
@@ -163,4 +165,46 @@ func (repositorio Equipe) BuscarTarefasDaEquipe(equipeId uint64) ([]modelos.Tare
 	}
 
 	return tarefasDaEquipe, nil
+}
+
+func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId, equipeId uint64) (modelos.Tarefas, error) {
+	linha, erro := repositorio.db.Query("select id, autor_id, tarefa, observacao, prazo from tarefas_equipe WHERE equipes_id = ? and id = ?",
+		equipeId, tarefaId,
+	)
+	if erro != nil {
+		return modelos.Tarefas{}, erro
+	}
+	defer linha.Close()
+
+	var tarefa modelos.Tarefas
+
+	if linha.Next() {
+		if erro = linha.Scan(
+			&tarefa.Id,
+			&tarefa.AutorId,
+			&tarefa.Tarefa,
+			&tarefa.Obsevacao,
+			&tarefa.Prazo,
+		); erro != nil {
+			return modelos.Tarefas{}, erro
+		}
+	}
+
+	return tarefa, nil
+}
+
+func (repositorio Equipe) EditarTarefaDaEquipe(equipeId uint64, tarefaId uint64, Tarefa modelos.Tarefas)  error {
+	statement, erro := repositorio.db.Prepare(
+		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where equipes_id = ? and id = ? ",
+	)
+	if erro != nil {
+		return  erro
+	}
+	defer statement.Close()
+
+ 	if _, erro := statement.Exec(Tarefa.Tarefa, Tarefa.Obsevacao, Tarefa.Prazo, equipeId, tarefaId); erro != nil {
+		return erro
+	}
+
+	return nil
 }
