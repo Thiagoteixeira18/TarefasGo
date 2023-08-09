@@ -208,3 +208,20 @@ func (repositorio Equipe) EditarTarefaDaEquipe(equipeId uint64, tarefaId uint64,
 
 	return nil
 }
+
+
+func (repositorio Equipe) DeletarTarefaDaEquipe(equipeId, tarefaId uint64) error {
+    statement, erro := repositorio.db.Prepare(
+        "delete from tarefas_equipe where equipes_id = ? and id = ?",
+    )
+    if erro != nil {
+        return erro
+    }
+    defer statement.Close()
+
+    if _, erro = statement.Exec(equipeId, tarefaId);erro != nil {
+        return erro
+    }
+
+    return nil 
+}

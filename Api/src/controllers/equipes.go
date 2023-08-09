@@ -376,3 +376,49 @@ func EditarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
 
 	respostas.JSON(w, http.StatusOK, nil)
 }
+
+func DeletarTarefaDaEquipe(w http.ResponseWriter, r *http.Request) {
+    usuarioId, erro := autenticacao.ExtrairUsuarioID(r) 
+    if erro != nil {
+        respostas.Erro(w, http.StatusBadRequest, erro)
+        return
+    }
+
+    parametros := mux.Vars(r)
+    tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+    if erro != nil {
+        respostas.Erro(w, http.StatusBadRequest, erro)
+        return
+    }
+
+    equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+    if erro != nil {
+        respostas.Erro(w, http.StatusBadRequest, erro)
+        return
+    }
+
+    db, erro := banco.Conectar()
+    if erro != nil {
+        respostas.Erro(w, http.StatusInternalServerError, erro)
+        return
+    }
+    defer db.Close()
+
+    repositorio := repositorios.NovoRepositorioDeEquipes(db)
+    TarefaSalvaNoBanco, erro := repositorio.BuscarTarefaDaEquipe(tarefaId, equipeId)
+    if erro != nil {
+        respostas.Erro(w, http.StatusInternalServerError, erro)
+        return
+    }
+
+    if TarefaSalvaNoBanco.AutorId != usuarioId {
+        respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel deletar uma tarefa que não tenha sido você quem criou"))
+        return 
+    }
+
+    if erro = repositorio.DeletarTarefaDaEquipe(equipeId, tarefaId); erro != nil {
+        respostas.Erro(w, http.StatusInternalServerError, erro)
+    }
+
+    respostas.JSON(w, http.StatusOK, nil)
+}
