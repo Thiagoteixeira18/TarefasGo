@@ -66,5 +66,10 @@ var RotaDeEquipes = []Rota{
         Funcao:                controllers.DeletarTarefaDaEquipe,
         RequerAutententicacao: true,
     },
-
+	{
+        Uri:                   "/equipes/{equipeId}/adicionar/{usuarioId}",
+        Metodo:                http.MethodPost,
+        Funcao:                controllers.AdicionarUsuario,
+        RequerAutententicacao: true,
+    },
 }

@@ -193,35 +193,50 @@ func (repositorio Equipe) BuscarTarefaDaEquipe(tarefaId, equipeId uint64) (model
 	return tarefa, nil
 }
 
-func (repositorio Equipe) EditarTarefaDaEquipe(equipeId uint64, tarefaId uint64, Tarefa modelos.Tarefas)  error {
+func (repositorio Equipe) EditarTarefaDaEquipe(equipeId uint64, tarefaId uint64, Tarefa modelos.Tarefas) error {
 	statement, erro := repositorio.db.Prepare(
 		"update tarefas_equipe set tarefa = ?, observacao = ?, prazo = ? where equipes_id = ? and id = ? ",
 	)
 	if erro != nil {
-		return  erro
+		return erro
 	}
 	defer statement.Close()
 
- 	if _, erro := statement.Exec(Tarefa.Tarefa, Tarefa.Obsevacao, Tarefa.Prazo, equipeId, tarefaId); erro != nil {
+	if _, erro := statement.Exec(Tarefa.Tarefa, Tarefa.Obsevacao, Tarefa.Prazo, equipeId, tarefaId); erro != nil {
 		return erro
 	}
 
 	return nil
 }
 
-
 func (repositorio Equipe) DeletarTarefaDaEquipe(equipeId, tarefaId uint64) error {
-    statement, erro := repositorio.db.Prepare(
-        "delete from tarefas_equipe where equipes_id = ? and id = ?",
-    )
-    if erro != nil {
-        return erro
-    }
-    defer statement.Close()
+	statement, erro := repositorio.db.Prepare(
+		"delete from tarefas_equipe where equipes_id = ? and id = ?",
+	)
+	if erro != nil {
+		return erro
+	}
+	defer statement.Close()
 
-    if _, erro = statement.Exec(equipeId, tarefaId);erro != nil {
-        return erro
-    }
+	if _, erro = statement.Exec(equipeId, tarefaId); erro != nil {
+		return erro
+	}
 
-    return nil 
+	return nil
+}
+
+func (repositorio Equipe) Adicionar(equipeId, usuarioId uint64) error {
+	statement, erro := repositorio.db.Prepare(
+		"insert into usuarios_equipe (equipes_id, usuario_id) value(?, ?)",
+	)
+	if erro != nil {
+		return erro 
+	}
+	defer statement.Close()
+
+	if _, erro = statement.Exec(equipeId, usuarioId); erro != nil {
+		return erro 
+	}
+
+	return nil 
 }
