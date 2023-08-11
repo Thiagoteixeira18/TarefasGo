@@ -15,15 +15,16 @@ func NovoRepositorioDeTarefas(db *sql.DB) *Tarefas {
 }
 
 func (repositorio Tarefas) CriarTarefa(tarefa modelos.Tarefas) (uint64, error) {
-    statement, erro := repositorio.db.Prepare(
-        "insert into tarefas (tarefa, observacao, prazo, autor_id) value(?, ?, ?, ?)",
-    )
+    statement, erro := repositorio.db.Prepare(`
+        INSERT INTO tarefas (tarefa, observacao, prazo, autor_id, autor_nick)
+        VALUES (?, ?, ?, ?, (SELECT nick FROM usuarios WHERE id = ?))
+    `)
     if erro != nil {
         return 0, erro
     }
     defer statement.Close()
 
-    resultado, erro := statement.Exec(tarefa.Tarefa, tarefa.Obsevacao, tarefa.Prazo, tarefa.AutorId)
+    resultado, erro := statement.Exec(tarefa.Tarefa, tarefa.Obsevacao, tarefa.Prazo, tarefa.AutorId, tarefa.AutorId)
     if erro != nil {
         return 0, erro
     }
@@ -53,7 +54,7 @@ func (repositorio Tarefas) BuscarTarefa(tarefaId uint64) (modelos.Tarefas, error
             &tarefa.AutorId,
             &tarefa.Tarefa,
             &tarefa.Obsevacao,
-            &tarefa.Prazo,          
+            &tarefa.Prazo,
         ); erro != nil {
             return modelos.Tarefas{}, erro
         }
@@ -65,9 +66,9 @@ func (repositorio Tarefas) BuscarTarefa(tarefaId uint64) (modelos.Tarefas, error
 
 func (repositorio Tarefas) BuscarPorUsuario(usuarioId uint64) ([]modelos.Tarefas, error) {
     linhas, erro := repositorio.db.Query(`
-    select t.*, u.nick from tarefas t
-    join usuarios u on u.id = t.autor_id
-    where t.autor_id = ?`,
+        SELECT id, tarefa, observacao, prazo, autor_id, autor_nick
+        FROM tarefas
+        WHERE autor_id = ?`,
         usuarioId,
     )
     if erro != nil {
@@ -84,12 +85,13 @@ func (repositorio Tarefas) BuscarPorUsuario(usuarioId uint64) ([]modelos.Tarefas
             &tarefa.Id,
             &tarefa.Tarefa,
             &tarefa.Obsevacao,
-            &tarefa.AutorId,
             &tarefa.Prazo,
-            &tarefa.AutorNick,          
+            &tarefa.AutorId,
+            &tarefa.AutorNick,
         ); erro != nil {
             return nil, erro
         }
+
         if usuarioId != tarefa.AutorId {
             return nil, errors.New("Não é possível buscar tarefas de outro usuario!")
         }
@@ -98,6 +100,7 @@ func (repositorio Tarefas) BuscarPorUsuario(usuarioId uint64) ([]modelos.Tarefas
     }
     return Tarefa, nil
 }
+
 
 func (repositorio Tarefas) Deletar(tarefaId uint64) error {
     statement, erro := repositorio.db.Prepare("delete from tarefas where id = ? ")
@@ -127,4 +130,3 @@ func (repositorio Tarefas) Atualizar(tarefaId uint64, tarefaAtualziada modelos.T
 
     return nil
 }
-

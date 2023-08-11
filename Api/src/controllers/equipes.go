@@ -470,3 +470,160 @@ func AdicionarUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, nil)
 
 }
+
+func RemoverUsuario(w http.ResponseWriter, r *http.Request) {
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	if usuarioLogado != equipeSalvaNoBanco.AutorId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover um usuario se você não é o adiministrador"))
+		return
+	}
+
+	if usuarioLogado == usuarioId {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Não é possivel remover o adiministrador"))
+		return
+	}
+
+	if erro = repositorio.Remover(equipeId, usuarioId); erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, nil)
+
+}
+
+func BuscarUsuarioDaEquipe(w http.ResponseWriter, r *http.Request) {
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+
+	equipe, participante, erro := repositorio.BuscarParticipante(equipeId, usuarioId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+	}
+
+	
+	if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != participante.Id {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
+		return
+	}
+
+	if equipe == (modelos.Equipes{}) || participante == (modelos.Usuarios{}) {
+		respostas.Erro(w, http.StatusBadRequest, errors.New("Equipe ou usuário não encontrado!!"))
+		return
+	}
+
+
+
+	respostas.JSON(w, http.StatusOK, equipe)
+	respostas.JSON(w, http.StatusOK, participante)
+}
+
+func BuscarUsuariosDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametro := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametro["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioLogado, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusForbidden, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipeSalvaNoBanco, erro := repositorio.BuscarPorId(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	_, usuarioLogadoParticipante, erro := repositorio.BuscarParticipante(equipeId, usuarioLogado)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+	}
+
+	if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != usuarioLogadoParticipante.Id {
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
+		return
+	}
+
+	usuarios, erro := repositorio.BuscarParticipantesDaEquipe(equipeId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, usuarios)
+}
