@@ -3,7 +3,10 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"webapp/src/config"
+	"webapp/src/modelos"
 	"webapp/src/respostas"
 )
 
@@ -15,9 +18,22 @@ func FazerLogin(w http.ResponseWriter, r *http.Request) {
 		"senha": r.FormValue("senha"),
 	})
 
-	response, erro := http.Post("http://localhost:8080/login", "application//json", bytes.NewBuffer(usuario))
+	url := fmt.Sprintf("%s/login", config.APIURL)
+	response, erro := http.Post(url, "application//json", bytes.NewBuffer(usuario))
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+	var dadosAutenticacao modelos.DadosDeautenticacao
+	if erro := json.NewDecoder(response.Body).Decode(&dadosAutenticacao); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	respostas.JSON(w, http.StatusOK, nil)
 }
