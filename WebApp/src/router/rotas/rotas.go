@@ -2,6 +2,7 @@ package rotas
 
 import (
 	"net/http"
+	"webapp/src/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -13,12 +14,20 @@ type Rota struct {
 	RequerAutenticacao bool
 }
 
-
 func Configurar(router *mux.Router) *mux.Router {
 	rotas := RotasLogin
 	rotas = append(rotas, rotaUsuarios...)
+	rotas = append(rotas, RotaPaginaPrincipal)
 
 	for _, rota := range rotas {
+		if rota.RequerAutenticacao {
+			router.HandleFunc(rota.Uri,
+				midlewares.Logger(midlewares.Autenticar(rota.Funcao)),
+			).Methods(rota.Metodo)
+		} else {
+			router.HandleFunc(rota.Uri, midlewares.Logger(rota.Funcao)).Methods(rota.Metodo)
+		}
+
 		router.HandleFunc(rota.Uri, rota.Funcao).Methods(rota.Metodo)
 	}
 
