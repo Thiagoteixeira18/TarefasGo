@@ -69,10 +69,9 @@ func CriarTarefa(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscarTarefasDoUsuario(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
-	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
@@ -87,17 +86,6 @@ func BuscarTarefasDoUsuario(w http.ResponseWriter, r *http.Request) {
 	tarefas, erro := repositorio.BuscarPorUsuario(usuarioId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
-	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
-	if erro != nil {
-		respostas.Erro(w, http.StatusUnauthorized, erro)
-		return
-	}
-
-	if usuarioId != usuarioIDNoToken {
-		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível buscar tarefas que não seja do seu usuario"))
 		return
 	}
 

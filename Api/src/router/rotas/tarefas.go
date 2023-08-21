@@ -19,7 +19,7 @@ var RotasTarefas = []Rota{
 		RequerAutententicacao: true,
 	},
 	{
-		Uri:                   "/usuarios/{usuarioId}/tarefas",
+		Uri:                   "/tarefas",
 		Metodo:                http.MethodGet,
 		Funcao:                controllers.BuscarTarefasDoUsuario,
 		RequerAutententicacao: true,
