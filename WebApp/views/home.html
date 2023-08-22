@@ -2,17 +2,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina Principal</title>
+    <title>Todo-List</title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
 </head>
 <body>
-    <h2>Página Principal</h2>
 
-    {{ range . }}
-        <h3> Tarefas: {{ .Tarefa }} </h3>
-        <h4> Observacao: {{ .Obsevacao }}</h4>
-        <h5> Prazo: {{ .Prazo }}</h5>
+    {{ template "cabeçalho-Tarefas"}}
 
-        <hr/>
-    {{ end }}
+<div class="container-fluid">
+    <div class="row mt-4">
+        <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5">
+            <h3>Nova Tarefa</h3>
+            <fieldset>
+                <form id="nova-tarefa">
+                    <div class="form-group">
+                        <label for="tarefa">Tarefa</label>
+                        <input type="text" class="form-control" id="tarefa" name="tarefa" required="required"
+                            placeholder="Insira a sua tarefa!">
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="observacao">Observação</label>
+                        <textarea class="form-control" id="observacao" name="observacao" required="required"
+                            placeholder="Insira a observação da sua tarefa"></textarea>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="prazo">Prazo</label>
+                        <input type="date" class="form-control" id="prazo" name="prazo" required="required">
+                    </div>
+    
+                    <button class="btn btn-danger" type="submit">
+                        Publicar
+                    </button>
+                </form>
+            </fieldset>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
+            
+            {{ range . }}
+                <div class="jumbotron">
+                    <h1 class="display-4"> {{ .Tarefa }} </h1>
+                    <p class="lead"> {{ .Obsevacao }} </p>
+                    <hr class="my-4">
+                    <p> {{ .Prazo }} </p>
+                    <a class="btn btn-danger btn-lg" href="#" role="button">Learn more</a>
+                </div>   
+            {{ end }}
+
+        </div>
+    </div>
+</div>
+
+{{ template "rodape" }}
+
+{{ template "scripts" }}
 </body>
 </html>
