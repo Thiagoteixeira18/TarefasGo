@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/modelos"
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
@@ -39,5 +41,15 @@ func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.ExecutarTemplete(w, "home.html", tarefas)
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	utils.ExecutarTemplete(w, "home.html", struct {
+		Tarefas []modelos.Tarefas
+		UsuarioID   uint64
+	}{
+		Tarefas: tarefas,
+		UsuarioID: usuarioID,
+	})
+
 }
