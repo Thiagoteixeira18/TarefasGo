@@ -1,0 +1,28 @@
+{{ define "tarefa" }}
+<div class="jumbotron" data-tarefa-id="{{ .Id }}">
+    <h1 class="display-4"> {{ .Tarefa }} </h1>
+    <p class="lead"> {{ .Obsevacao }} </p>
+    <hr class="my-4">
+    <p> {{ .Prazo }} </p>
+    {{ template "check" }}
+    {{ template "editar" }}
+    {{ template "deletar" }}
+
+</div>   
+{{ end }}
+
+{{ define "check" }}
+<i class="fa-sharp fa-regular fa-circle-check concluir-tarefa" style="cursor: pointer;"></i>
+{{ end }}
+
+{{ define "editar"}}
+<a href="/editar" style="text-decoration: none;">
+<i class="fa-solid fa-pen-to-square"></i>
+</a>
+{{ end }}
+
+{{ define "deletar" }}
+<a href="/deletar" style="text-decoration: none;">
+<i class="fa-solid fa-trash text-danger"></i>
+</a>
+{{ end }}
