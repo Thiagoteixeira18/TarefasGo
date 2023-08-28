@@ -26,5 +26,4 @@ $.ajax({
     console.log(erro);
   alert("erro ao cadastrar usuario");
 });
-
 }
