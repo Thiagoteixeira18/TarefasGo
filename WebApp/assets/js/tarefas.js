@@ -16,12 +16,21 @@ function criarTarefa(evento) {
     }).done(function() {
        window.location = "/home";
     }).fail(function() {
-       alert("Erro ao criar publicação!!!");
+        Swal.fire("Ops...", "Erro ao criar tarefa", "error");
     }) 
 }
 
 function concluirTarefa(evento) {
     evento.preventDefault(); 
+
+    Swal.fire({
+        title: "Atenção!",
+        text: "Deseja excluir essa tarefa?",
+        showCancelButton: true,
+        CancelButtonText: "Cancelar",
+        icon: "Warning"
+    }).then(function(confirmacao) {
+        if (!confirmacao.value) return;
 
     const elementoClicado = $(evento.target);
     const tarefa = elementoClicado.closest('div');
@@ -30,7 +39,7 @@ function concluirTarefa(evento) {
     elementoClicado.prop('disabled', true);
 
     $.ajax({
-        url: `/tarefas/${tarefaId}`,
+        url: `/tarefas/${tarefaId}`,    
         method: "DELETE"
     }).done(function() {
         tarefa.fadeOut("slow", function() {
@@ -39,11 +48,21 @@ function concluirTarefa(evento) {
     }).fail(function() {
         Swal.fire("Ops...", "Erro ao concluir a tarefa", "error");
     });
+})
 }
 
 function deletarTarefa(evento) {
     evento.preventDefault(); 
-   
+
+    Swal.fire({
+        title: "Atenção!",
+        text: "Deseja realmente excluir essa tarefa?",
+        showCancelButton: true,
+        cancelButtonText: "Cancelar",
+        icon: "warning"
+    }).then(function(confirmacao) {
+        if (!confirmacao.value) return;
+    
     const elementoClicado = $(evento.target);
     const tarefa = elementoClicado.closest('div');
     const tarefaId = tarefa.data('tarefa-id');
@@ -58,4 +77,5 @@ function deletarTarefa(evento) {
     }).fail(function() {
         Swal.fire("Ops...", "Erro ao excluir a tarefa", "error");
     });
+})
 }
