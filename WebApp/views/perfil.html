@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo-List - {{ .Nome }} </title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    {{ template "cabeçalho-Tarefas" }}
+
+    <div class="container-fluid">
+        <div class=" row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Meu Perfil</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ .Nome }}  
+                        </h6>
+
+                        <p class="card-text">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-tarefas">
+                                Tarefas: {{ len .Tarefas }}
+                            </a>
+                    -
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-equipes">
+                                Equipes: {{ len .Equipes }}
+                            </a>
+
+                        </p>
+                        
+
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="/editar-usuario" class="card-link"><button class="btn btn-info">Editar Usuário</button>
+                                </a>
+
+                                <a href="/editar-senha" class="card-link">
+                                    <button class="btn btn-info">Atualizar Senha</button>
+                                </a>
+                                <a id="deletar-usuario" class="card-link">
+                                    <button class="btn btn-info">
+                                        Excluir conta permanentemente
+                                    </button>
+                                </a>                                
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <div style="text-align: center;">
+                        <h5 class="card-title">Minhas Tarefas</h5>
+                    </div>
+                    <p class="card-text"> 
+                        {{ range .Tarefas }} 
+                            {{ template "tarefa" . }}
+                        {{ else }}
+                            <p class="text-muted text-center">
+                                Nenhuma tarefa por aqui :/
+                            </p>
+                        {{ end }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <div style="text-align: center;">
+                        <h5 class="card-title">Minhas Equipes</h5>
+                    </div>
+                    <div class="team-list">
+                        {{ range .Equipes }} 
+                        <div class="jumbotron" data-equipe-id="{{ .Id }}" style="padding: 10px;">
+                            <h2 class="display-5">
+                                <a href="/equipes/{{ .Id }}/perfil" style="text-decoration: none; color: inherit;">
+                                    {{ .Nome }}
+                                </a>
+                            </h2>
+                            <p class="lead" style="font-size: 14px;"> {{ .Descricao }} </p>
+                            {{ template "editar-equipe" . }}
+                            {{ template "deletar-equipe" }} 
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+
+{{ template "rodape" }}
+{{ template "scripts" }}
+
+<script src="/assets/js/tarefas.js"></script>
+<script src="/assets/js/usuario.js"></script>
+<script src="/assets/js/equipes.js"></script>
+
+</body>
+</html>
+    
+</body>
+</html>
