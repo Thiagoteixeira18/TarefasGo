@@ -21,7 +21,7 @@
 
                         <p class="card-text">
                             <a href="#" data-bs-toggle="modal" data-bs-target="#modal-tarefas">
-                                Tarefas: {{ len .Tarefas }}
+                                Tarefas: {{ len .tarefas }}
                             </a>
                     -
                             <a href="#" data-bs-toggle="modal" data-bs-target="#modal-equipes">
@@ -65,7 +65,7 @@
                             {{ template "tarefa" . }}
                         {{ else }}
                             <p class="text-muted text-center">
-                                Nenhuma tarefa por aqui :/
+                                Nenhuma tarefa por aqui 
                             </p>
                         {{ end }}
                     </p>

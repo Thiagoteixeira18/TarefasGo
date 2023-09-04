@@ -62,3 +62,20 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
+
+func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	canal := make(chan modelos.Usuario)
+	go modelos.BuscaDadosUsuario(canal, usuarioId, r)
+	usuario := <-canal
+
+	if usuario.Id == 0 {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: "Erro ao buscar usuário"})
+		return
+	}
+
+	utils.ExecutarTemplete(w, "editar-usuario.html", usuario)
+
+}
