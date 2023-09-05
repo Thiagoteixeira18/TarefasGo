@@ -18,4 +18,10 @@ var rotasTarefas = []Rota{
 		Funcao:             controllers.ConcluirTarefa,
 		RequerAutenticacao: true,
 	},
+	{
+		Uri:                "/tarefas/{tarefaId}",
+		Metodo:             http.MethodPut,
+		Funcao:             controllers.EditarTarefa,
+		RequerAutenticacao: true,
+	},
 }

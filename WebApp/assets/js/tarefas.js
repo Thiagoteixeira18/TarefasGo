@@ -79,3 +79,31 @@ function deletarTarefa(evento) {
     });
 })
 }
+function atualizarTarefa(evento) {
+    $(this).prop('disabled', true);
+
+    const tarefaId = $(this).data('tarefa-id');
+    
+    $.ajax({
+        url: `/tarefas/${tarefaId}`,
+        method: "PUT",
+        data: {
+            tarefa: $('#tarefa').val(),
+            observacao: $('#observacao').val(),
+            prazo: $('#prazo').val()
+        }
+    }).done(function() {
+        Swal.fire( 
+            'Sucesso',
+            'Tarefa atualizada com sucesso!',
+            'success')
+            .then(function() {
+                window.location = "/home";
+            })
+        }).fail(function() {
+            Swal.fire("Ops...", "Falha em editar a tarefa!!", "error");
+    }).always(function() {
+        $('#atualizar-tarefa').prop('disabled', false)
+    });
+    
+} 
