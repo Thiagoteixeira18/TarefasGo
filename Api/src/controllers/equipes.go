@@ -104,6 +104,32 @@ func BuscarEquipe(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, equipe)
 }
 
+func BuscarEquipesDoUsuario(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioId, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
+	if erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	db, erro := banco.Conectar()
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	defer db.Close()
+
+	repositorio := repositorios.NovoRepositorioDeEquipes(db)
+	equipes, erro := repositorio.BuscarEquipesUsuario(usuarioId)
+	if erro != nil {
+		respostas.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	respostas.JSON(w, http.StatusOK, equipes)
+
+}
+
 func AtualizarEquipe(w http.ResponseWriter, r *http.Request) {
 	usuarioId, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -558,13 +584,11 @@ func BuscarUsuarioDaEquipe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	equipe, participante, erro := repositorio.BuscarParticipante(equipeId, usuarioId)
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 	}
 
-	
 	if usuarioLogado != equipeSalvaNoBanco.AutorId && usuarioLogado != participante.Id {
 		respostas.Erro(w, http.StatusUnauthorized, errors.New("Você precisa ser um participante ou dono da equipe para ver todos seus participantes"))
 		return
@@ -574,8 +598,6 @@ func BuscarUsuarioDaEquipe(w http.ResponseWriter, r *http.Request) {
 		respostas.Erro(w, http.StatusBadRequest, errors.New("Equipe ou usuário não encontrado!!"))
 		return
 	}
-
-
 
 	respostas.JSON(w, http.StatusOK, equipe)
 	respostas.JSON(w, http.StatusOK, participante)

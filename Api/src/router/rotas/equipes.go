@@ -25,6 +25,12 @@ var RotaDeEquipes = []Rota{
 		RequerAutententicacao: true,
 	},
 	{
+		Uri:                   "/usuarios/{usuarioId}/equipes",
+		Metodo:                http.MethodGet,
+		Funcao:                controllers.BuscarEquipesDoUsuario,
+		RequerAutententicacao: true,
+	},
+	{
 		Uri:                   "/equipes/{equipeId}",
 		Metodo:                http.MethodPut,
 		Funcao:                controllers.AtualizarEquipe,

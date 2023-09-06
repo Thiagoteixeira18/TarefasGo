@@ -89,6 +89,34 @@ func (repositorio Equipe) BuscarPorId(equipeId uint64) (modelos.Equipes, error) 
 	return Equipe, nil
 }
 
+func (repositorio Equipe) BuscarEquipesUsuario(usuarioId uint64) ([]modelos.Equipes, error) {
+	linhas, erro := repositorio.db.Query(
+		"select id, nome, descricao, autor_id from equipes where autor_id = ?",
+		usuarioId,
+	)
+	if erro != nil {
+		return nil, erro
+	}
+	defer linhas.Close()
+
+	var equipes []modelos.Equipes
+	for linhas.Next() {
+		var equipe modelos.Equipes
+
+		if erro = linhas.Scan(
+			&equipe.Id,
+			&equipe.Nome,
+			&equipe.Descricao,
+			&equipe.AutorId,
+		); erro != nil {
+			return nil, erro
+		}
+		equipes = append(equipes, equipe)
+	}
+
+	return equipes, nil
+}
+
 func (repositorio Equipe) AtualizarEquipe(equipeId uint64, Equipe modelos.Equipes) error {
 	statement, erro := repositorio.db.Prepare("update equipes set nome = ?, descricao = ? where id = ?")
 	if erro != nil {
