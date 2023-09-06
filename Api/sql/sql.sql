@@ -1,27 +1,11 @@
-
-Conversa aberta. Uma mensagem não lida.
-
-Pular para o conteúdo
-Como usar o Gmail com leitores de tela
-1 de 5.206
-sql
-Caixa de entrada
-
-deivid teixeira
-14:36 (há 0 minuto)
-para mim
-
-   
-Traduzir mensagem
-Desativar para: inglês
 CREATE DATABASE IF NOT EXISTS todo;
 USE todo;
 
-DROP TABLE IF EXISTS usuarios;
-DROP TABLE IF EXISTS tarefas;
-DROP TABLE IF EXISTS equipes;
-DROP TABLE IF EXISTS tarefas_equipe;
 DROP TABLE IF EXISTS usuarios_equipe;
+DROP TABLE IF EXISTS tarefas_equipe;
+DROP TABLE IF EXISTS equipes;
+DROP TABLE IF EXISTS tarefas;
+DROP TABLE IF EXISTS usuarios;
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
