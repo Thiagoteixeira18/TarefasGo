@@ -1,12 +1,12 @@
 {{ define "tarefa" }}
 <div class="jumbotron" data-tarefa-id="{{ .Id }}">
     <h1 class="display-4"> {{ .Tarefa }} </h1>
-    <p class="lead"> {{ .Obsevacao }} </p>
+    <p class="lead"> {{ .Observacao }} </p>
     <hr class="my-4">
     <p> {{ .Prazo }} </p>
-    {{ template "check" }}
-    {{ template "editar" }}
-    {{ template "deletar" }}
+    {{ template "check" . }}
+    {{ template "editar" . }}
+    {{ template "deletar" . }}
 
 </div>   
 {{ end }}
@@ -16,7 +16,7 @@
 {{ end }}
 
 {{ define "editar" }}
-<a href="/editar" style="text-decoration: none;">
+<a href="/editar/{{ .Id }}/tarefa" style="text-decoration: none;">
 <i class="fa-solid fa-pen-to-square"></i>
 </a>
 {{ end }}

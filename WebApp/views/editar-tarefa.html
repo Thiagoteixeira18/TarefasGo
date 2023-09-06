@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo-List - Atualizar tarefa - {{ .Tarefa }} </title>
+    <title>Todo-List - Atualizar tarefa</title>
     <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
@@ -22,8 +22,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="conteudo">Observação</label>
-                    <textarea class="form-control" id="observacao" name="observacao" placeholder="Escreva sua observação.">{{ .Obsevacao }}</textarea>
+                    <label for="conteudo">Observacao</label>
+                    <textarea class="form-control" id="observacao" name="observacao" placeholder="Escreva sua observacao.">{{ .Observacao }}</textarea>
                 </div>
 
                 <div class="form-group">
@@ -43,7 +43,5 @@
     {{ template "scripts" }}
 
     <script src="/assets/js/tarefas.js"></script>
-
 </body>
-
 </html>

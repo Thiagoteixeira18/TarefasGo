@@ -11,6 +11,8 @@ import (
 	"webapp/src/requisicoes"
 	"webapp/src/respostas"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
@@ -78,4 +80,35 @@ func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecutarTemplete(w, "editar-usuario.html", usuario)
 
+}
+
+func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
+	parametros:= mux.Vars(r)
+	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	url:= fmt.Sprintf("%s/tarefas/%d", config.APIURL, tarefaId)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	var tarefa modelos.Tarefas
+
+	if erro = json.NewDecoder(response.Body).Decode(&tarefa); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplete(w, "editar-tarefa.html", tarefa)
 }

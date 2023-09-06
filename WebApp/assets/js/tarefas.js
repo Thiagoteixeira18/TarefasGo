@@ -1,6 +1,7 @@
 $('#nova-tarefa').on('submit', criarTarefa);
 $('.concluir-tarefa').on("click", concluirTarefa);
 $('.deletar-tarefa').on("click", deletarTarefa);
+$('#atualizar-tarefa').on("click", atualizarTarefa);
 
 function criarTarefa(evento) {
     evento.preventDefault();
@@ -79,6 +80,7 @@ function deletarTarefa(evento) {
     });
 })
 }
+
 function atualizarTarefa(evento) {
     $(this).prop('disabled', true);
 
