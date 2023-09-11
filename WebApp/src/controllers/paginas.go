@@ -112,3 +112,7 @@ func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
 
 	utils.ExecutarTemplete(w, "editar-tarefa.html", tarefa)
 }
+
+func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
+	utils.ExecutarTemplete(w, "editar-senha.html", nil)
+}
