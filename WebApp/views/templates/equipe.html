@@ -1,0 +1,9 @@
+{{ define "editar-equipe" }}
+<a href="/equipes/{{ .Id }}/editar" style="text-decoration: none;">
+    <i class="fa-solid fa-pen-to-square"></i>
+</a>
+{{ end }}
+
+{{ define "deletar-equipe" }}
+<i class="fas fa-trash text-danger deletar-equipe" style="cursor: pointer;"></i>
+{{ end }}

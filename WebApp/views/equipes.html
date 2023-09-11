@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo-List </title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+</head>
+
+<body> 
+    {{ template "cabeçalho-Tarefas" }}
+
+    <div class="container-fluid">
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Nova Equipe</h3>
+                <fieldset>
+                    <form id="nova-equipe">
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required="required"
+                                placeholder="Insira o nome da tarefa">
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" required="required"
+                                placeholder="Insira a descrição da tarefa"></textarea>
+                        </div>
+        
+                        <button class="btn btn-info" type="submit">
+                           Criar Equipe
+                        </button>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div style="text-align: center;">
+                    <h5 class="card-title">Minhas Equipes</h5>
+                </div>
+                <div class="team-list">
+                    {{ range . }} 
+                    <div class="jumbotron" data-equipe-id="{{ .Id }}" style="padding: 10px;">
+                        <h2 class="display-5">
+                            <a href="/equipes/{{ .Id }}/perfil" style="text-decoration: none; color: inherit;">
+                                {{ .Nome }}
+                            </a>
+                        </h2>
+                        <p class="lead" style="font-size: 14px;"> {{ .Descricao }} </p>
+                        {{ template "editar-equipe" . }}
+                        {{ template "deletar-equipe" }}                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{{ template "rodape" }}
+{{ template "scripts" }}
+<script src="/assets/js/equipes.js"></script>
+
+
+</body>
+</html>

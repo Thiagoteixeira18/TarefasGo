@@ -116,3 +116,22 @@ func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
 func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplete(w, "editar-senha.html", nil)
 }
+
+
+func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
+    cookie, _ := cookies.Ler(r)
+    usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+    canal := make(chan []modelos.Equipes)
+    go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
+    equipesCarregadas := <-canal
+
+    var equipes []modelos.Equipes
+    if equipesCarregadas == nil {
+        equipes = []modelos.Equipes{}
+    } else {
+        equipes = equipesCarregadas
+    }
+
+    utils.ExecutarTemplete(w, "equipes.html", equipes)
+}
