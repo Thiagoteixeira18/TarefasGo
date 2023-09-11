@@ -61,7 +61,7 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
-
+	
 	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
 

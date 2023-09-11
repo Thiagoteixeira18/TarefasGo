@@ -18,18 +18,27 @@ type Rota struct {
 // Configurar coloca todas as rotas dentro do router ja configurado
 func Configurar(r *mux.Router) *mux.Router {
 	rotas := rotasDeUsuarios
+	rotas = append(rotas, rotasDeUsuarios...)
 	rotas = append(rotas, rotaLogin)
 	rotas = append(rotas, RotasTarefas...)
 	rotas = append(rotas, RotaDeEquipes...)
 
 	for _, rota := range rotas {
 		if rota.RequerAutententicacao {
-			r.HandleFunc(rota.Uri, middlewares.Loger(middlewares.Autenticar(rota.Funcao))).Methods(rota.Metodo)
+			r.HandleFunc(rota.Uri,
+				middlewares.Loger(middlewares.Autenticar(rota.Funcao)),
+			).Methods(rota.Metodo)
 		} else {
 			r.HandleFunc(rota.Uri, middlewares.Loger(rota.Funcao)).Methods(rota.Metodo)
 		}
-	}
- 
-	return r
 
+		r.HandleFunc(rota.Uri, rota.Funcao).Methods(rota.Metodo)
+	}
+
+	fileServer := http.FileServer(http.Dir("./assets/"))
+	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer))
+
+	return r
 }
+ 
+	

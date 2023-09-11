@@ -24,7 +24,7 @@ func BuscarUsuarioCompleto(usuarioId uint64, r *http.Request) (Usuario, error) {
     canalEquipes := make(chan []Equipes)
 
     go BuscaDadosUsuario(canalUsuario, usuarioId, r)
-    go BuscaTarefasDoUsuaro(canalTarefas, usuarioId, r)
+    go BuscaTarefasDoUsuario(canalTarefas, usuarioId, r)
     go BuscaEquipesDoUsuario(canalEquipes, usuarioId, r)
 
     var (
@@ -46,9 +46,9 @@ func BuscarUsuarioCompleto(usuarioId uint64, r *http.Request) (Usuario, error) {
             if tarefasCarregadas == nil {
 				tarefas = []Tarefas{}
 			} else {
-                return Usuario{}, errors.New("Erro ao buscar tarefas")
-            }
-            tarefas = tarefasCarregadas
+				tarefas = tarefasCarregadas
+			}
+           
 
         case equipesCarregadas := <-canalEquipes:
             if equipesCarregadas == nil {
@@ -88,7 +88,7 @@ func BuscaDadosUsuario(canal chan<- Usuario, usuarioId uint64, r *http.Request) 
 	canal <- usuario
 }
 
-func BuscaTarefasDoUsuaro(canal chan<- []Tarefas, usuarioId uint64, r *http.Request) {
+func BuscaTarefasDoUsuario(canal chan<- []Tarefas, usuarioId uint64, r *http.Request) {
 	url := fmt.Sprintf("%s/usuarios/%d/tarefas", config.APIURL, usuarioId)
 	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
 	if erro != nil {

@@ -36,4 +36,10 @@ var rotasDeUsuarios = []Rota{
 		Funcao:                controllers.AtualizarSenha,
 		RequerAutententicacao: true,
 	},
+	{
+		Uri:                   "/usuarios/{usuarioId}/tarefas",
+		Metodo:                http.MethodGet,
+		Funcao:                controllers.BuscarTarefasDoUsuarioRequisicao,
+		RequerAutententicacao: true,
+	},
 }
