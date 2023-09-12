@@ -30,4 +30,22 @@ var RotaEquipes = []Rota{
 		Funcao:             controllers.EditarEquipe,
 		RequerAutenticacao: true,
 	},
+	{
+		Uri:                "/tarefas/{tarefaId}/equipes",
+		Metodo:             http.MethodGet,
+		Funcao:             controllers.CarregarPaginaDeEdicaoDeTarefaDeEquipe,
+		RequerAutenticacao: true,
+	},
+	{
+		Uri:                "/tarefas/{tarefaId}/equipe",
+		Metodo:             http.MethodPut,
+		Funcao:             controllers.AtualizarTarefaDeEquipe,
+		RequerAutenticacao: true,
+	},
+	{
+		Uri:                "/equipes/{equipeId}",
+		Metodo:             http.MethodDelete,
+		Funcao:             controllers.DeletarEquipe,
+		RequerAutenticacao: true,
+	},
 }
