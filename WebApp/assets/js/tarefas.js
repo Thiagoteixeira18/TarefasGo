@@ -26,7 +26,7 @@ function concluirTarefa(evento) {
 
     Swal.fire({
         title: "Atenção!",
-        text: "Deseja excluir essa tarefa?",
+        text: "Deseja concluir essa tarefa?",
         showCancelButton: true,
         CancelButtonText: "Cancelar",
         icon: "Warning"

@@ -16,3 +16,4 @@ function criarEquipe(evento) {
         Swal.fire("Ops...", "Erro ao criar a equipe!!!", "error");
     })
 }
+

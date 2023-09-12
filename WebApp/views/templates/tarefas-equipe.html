@@ -1,0 +1,25 @@
+{{ define "tarefaEquipe" }}
+
+<div class="jumbotron" data-tarefa-equipe-id="{{ .Id }}" style="padding: 10px;">
+    <h2 class="display-5"> {{ .Tarefa }} </h2>
+    <p class="lead" style="font-size: 14px;"> {{ .Obsevacao }} </p>
+    <p class="style="font-size: 14px;> {{ .Prazo }}  </p>
+    {{template "concluirTarefaEquipe" . }}
+    {{template "editarTarefaEquipe" . }}
+    {{template "deletarTarefaEquipe" . }}
+
+{{ end }}
+
+{{ define "concluirTarefaEquipe" }}
+<i class="fa-sharp fa-regular fa-circle-check concluir-tarefa-equipe" style="cursor: pointer;"></i>
+{{ end }}
+
+{{ define "editarTarefaEquipe" }}
+<a href="/tarefas/{{ .Id }}/equipes" style="text-decoration: none;">
+    <i class="fa-solid fa-pen-to-square"></i>
+</a>
+{{ end }}
+
+{{define "deletarTarefaEquipe" }}
+<i class="fas fa-trash text-danger deletar-tarefa-equipe" style="cursor: pointer;"></i>
+{{ end }}

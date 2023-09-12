@@ -61,7 +61,7 @@ func CarregarPerfilDoUsuario(w http.ResponseWriter, r *http.Request) {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
-	
+
 	utils.ExecutarTemplete(w, "perfil.html", usuario)
 }
 
@@ -83,14 +83,14 @@ func CarregarPaginaDeEdicaoDoUsuario(w http.ResponseWriter, r *http.Request) {
 }
 
 func CarregarPaginaDeEdicaoDeTarefa(w http.ResponseWriter, r *http.Request) {
-	parametros:= mux.Vars(r)
+	parametros := mux.Vars(r)
 	tarefaId, erro := strconv.ParseUint(parametros["tarefaId"], 10, 64)
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
 
-	url:= fmt.Sprintf("%s/tarefas/%d", config.APIURL, tarefaId)
+	url := fmt.Sprintf("%s/tarefas/%d", config.APIURL, tarefaId)
 	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
 	if erro != nil {
 		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
@@ -117,21 +117,51 @@ func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
 	utils.ExecutarTemplete(w, "editar-senha.html", nil)
 }
 
-
 func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
-    cookie, _ := cookies.Ler(r)
-    usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+	cookie, _ := cookies.Ler(r)
+	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
-    canal := make(chan []modelos.Equipes)
-    go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
-    equipesCarregadas := <-canal
+	canal := make(chan []modelos.Equipes)
+	go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
+	equipesCarregadas := <-canal
 
-    var equipes []modelos.Equipes
-    if equipesCarregadas == nil {
-        equipes = []modelos.Equipes{}
-    } else {
-        equipes = equipesCarregadas
-    }
+	var equipes []modelos.Equipes
+	if equipesCarregadas == nil {
+		equipes = []modelos.Equipes{}
+	} else {
+		equipes = equipesCarregadas
+	}
 
-    utils.ExecutarTemplete(w, "equipes.html", equipes)
+	utils.ExecutarTemplete(w, "equipes.html", equipes)
+}
+
+func CarregarPaginaDeEdicaoDeEquipe(w http.ResponseWriter, r *http.Request) {
+	paramentros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(paramentros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/equipes/%d", config.APIURL, equipeId)
+	response, erro := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		respostas.TratarStatusCodeDeErro(w, response)
+		return
+	}
+
+	var equipe modelos.Equipes
+
+	if erro = json.NewDecoder(response.Body).Decode(&equipe); erro != nil {
+		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	utils.ExecutarTemplete(w, "editar-equipe.html", equipe)
 }
