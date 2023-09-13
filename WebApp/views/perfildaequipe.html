@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo-List - {{ .Nome }} </title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    {{ template "cabeçalho-Tarefas" }}
+    <div class="container-fluid"  data-tarefa-equipe-id="{{ .Id }}">
+        <div class=" row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Minha Equipe </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {{ .Nome }}  
+                        </h6>
+
+                        <p class="card-text">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-tarefas">
+                                Tarefas: {{ len .Tarefas }}
+                            </a>
+                    -
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modal-participantes">
+                                Participantes: {{ len .Participantes }}
+                            </a>
+
+                        </p>
+                                                      
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid"  data-tarefa-equipe-id="{{ .Id }}">
+        <div class="row mt-4">
+            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-5">
+                <h3>Nova Tarefa de equipe </h3>
+                <fieldset>
+                    <form id="nova-tarefa-equipe">
+                        <div class="form-group">
+                            <label for="tarefa-equipe">Tarefa</label>
+                            <input type="text" class="form-control" id="tarefa-equipe" name="tarefa-equipe" required="required"
+                                placeholder="Insira a sua tarefa!">
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="observacao-equipe">Observação</label>
+                            <textarea class="form-control" id="observacao-equipe" name="observacao-equipe" required="required"
+                                placeholder="Insira a observação da sua tarefa"></textarea>
+                        </div>
+        
+                        <div class="form-group">
+                            <label for="prazo-equipe">Prazo</label>
+                            <input type="text" class="form-control" id="prazo-equipe" name="prazo-equipe" required="required"
+                                   placeholder="dd-mm-aaaa">
+                        </div>
+                        
+        
+                        <button class="btn btn-danger" type="submit" data-equipe-id="{{ .Id }}">
+                            Publicar
+                        </button>
+                    </form>
+                </fieldset>
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7" data-equipe-id="{{ .Id }}">
+            
+                {{ range .Tarefas }}
+               {{ template "tarefaEquipe" . }}
+            </div>
+                {{ end }}
+            </div>
+            </div>
+        </div>
+    </div>
+         
+        {{ template "rodape" }}
+        {{ template "scripts" }}
+        
+    <script src="/assets/js/equipes.js"></script>
+</body>
+</html>

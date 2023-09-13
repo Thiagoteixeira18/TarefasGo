@@ -118,21 +118,21 @@ func CarregarPaginaDeEdicaoDoSenha(w http.ResponseWriter, r *http.Request) {
 }
 
 func CarregarPaginaDeEquipes(w http.ResponseWriter, r *http.Request) {
-	cookie, _ := cookies.Ler(r)
-	usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
+    cookie, _ := cookies.Ler(r)
+    usuarioId, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
-	canal := make(chan []modelos.Equipes)
-	go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
-	equipesCarregadas := <-canal
+    canal := make(chan []modelos.Equipes)
+    go modelos.BuscaEquipesDoUsuario(canal, usuarioId, r)
+    equipesCarregadas := <-canal
 
-	var equipes []modelos.Equipes
-	if equipesCarregadas == nil {
-		equipes = []modelos.Equipes{}
-	} else {
-		equipes = equipesCarregadas
-	}
+    var equipes []modelos.Equipes
+    if equipesCarregadas == nil {
+        equipes = []modelos.Equipes{}
+    } else {
+        equipes = equipesCarregadas
+    }
 
-	utils.ExecutarTemplete(w, "equipes.html", equipes)
+    utils.ExecutarTemplete(w, "equipes.html", equipes)
 }
 
 func CarregarPaginaDeEdicaoDeEquipe(w http.ResponseWriter, r *http.Request) {
@@ -195,4 +195,23 @@ func CarregarPaginaDeEdicaoDeTarefaDeEquipe(w http.ResponseWriter, r *http.Reque
 	}
 
 	utils.ExecutarTemplete(w, "editar-tarefa-equipe.html", tarefa)
+}
+
+
+func BuscainformacoesDaEquipe(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	equipeId, erro := strconv.ParseUint(parametros["equipeId"], 10, 64)
+	if erro != nil {
+		respostas.JSON(w, http.StatusBadRequest, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+	equipe, erro := modelos.BuscarEquipeCompleta(equipeId, r)
+	if erro != nil {
+		respostas.JSON(w, http.StatusInternalServerError, respostas.ErroAPI{Erro: erro.Error()})
+		return
+	}
+
+
+	utils.ExecutarTemplete(w, "perfildaequipe.html", equipe)
 }

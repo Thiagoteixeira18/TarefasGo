@@ -1,6 +1,8 @@
 $('#nova-equipe').on("submit", criarEquipe);
 $('#atualizar-tarefa-equipe').on("click", editarTarefaDeEquipe);
 $('.deletar-equipe').on("click", deletarEquipe);
+$('.btn-danger').on('click', criarTarefaEquipe);
+$('.concluir-tarefa-equipe').on("click", concluirTarefaDeEquipe);
 
 function criarEquipe(evento) {
     evento.preventDefault();
@@ -76,4 +78,25 @@ function deletarEquipe(evento) {
         Swal.fire("Ops...", "Erro ao excluir a equipe", "error");
     });
 })
+}
+
+function criarTarefaEquipe(evento) {
+    evento.preventDefault(); 
+
+    // Obtenha o ID diretamente do botão de Publicar clicado
+    const equipeId = $(this).data('equipe-id'); 
+
+    $.ajax({
+        url: `/equipes/${equipeId}/tarefas`,
+        method: "POST",
+        data: {
+            tarefa: $('#tarefa-equipe').val(),
+            observacao: $('#observacao-equipe').val(),
+            prazo: $('#prazo-equipe').val(),
+        }
+    }).done(function() {
+        window.location = `/equipes/${equipeId}/perfil`;
+    }).fail(function() {
+        Swal.fire("Ops...", "Erro ao criar a tarefa!!!", "error");
+    })
 }
