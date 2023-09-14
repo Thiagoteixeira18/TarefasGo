@@ -13,7 +13,7 @@ var RotaEquipes = []Rota{
 		RequerAutenticacao: true,
 	},
 	{
-		Uri:                "/equipes",
+		Uri:                "/equipe",
 		Metodo:             http.MethodPost,
 		Funcao:             controllers.CriarEquipes,
 		RequerAutenticacao: true,
